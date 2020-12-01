@@ -1,5 +1,13 @@
-main = print =<< brute . map read . words <$> getContents
+import Data.List (sort)
+main = print =<< solve 2020 . map read . words <$> getContents
 
--- horrible complexity...
-brute :: [Integer] -> Integer 
-brute xs = head [x*y*z | x <- xs, y <- xs, z <- xs, x + y + z == 2020]
+-- O(n^2) non-exhaustive in case of no answer...
+solve t xs = f sortedXs $ reverse sortedXs
+  where sortedXs = sort xs
+        f (z:zs) (y:ys)
+          | z + y > t  = f (z:zs) ys
+          | z + y <= t = 
+            if (t-z-y) `elem` sortedXs 
+              then (t-z-y)*z*y 
+              else f zs (y:ys)  
+          
