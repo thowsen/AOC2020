@@ -12,8 +12,8 @@ solve rows seats str = f rows (take 7 str) * 8 + f seats (drop 7 str)
         'F' -> f (take (length xs `div` 2) xs) str'
         'B' -> f (drop (length xs `div` 2) xs) str'
 
-main' :: IO ()
-main' = let 
+main :: IO ()
+main = let 
   repl 'L' = 'F'
   repl 'R' = 'B' 
   repl  x  =  x 
