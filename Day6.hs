@@ -1,9 +1,9 @@
 import Data.List.Split (splitOn)
 import Data.List (nub, intersect)
 
-solve f = print . sum . map f
+solve f = sum . map (length . f)
 
 main = do 
-  inp <- splitOn "\n\n" <$> getContents
-  solve (length . nub . concat . lines) inp 
-  solve (length . (\(x:xs) -> foldr intersect x xs) . lines) inp
+  inp <- map lines . splitOn "\n\n" <$> getContents
+  print $ (,) (solve (nub . concat) inp) (solve (foldr1 intersect) inp)
+
