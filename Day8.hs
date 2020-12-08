@@ -3,25 +3,33 @@ import Data.Array (bounds, array, Array, (//), (!))
 import Data.Char (isLetter, isDigit)
 import Data.Maybe (fromMaybe, isJust)
 
+main =  
+  brute . 
+  (\x -> array (0, length x) $ zip [0..] x) . 
+  zip (repeat False) . 
+  map read . 
+  lines =<< readFile "input.txt"
+
+-- Parsing boilerplate
 data Instruction = Nop Op Int | Acc Op Int | Jmp Op Int deriving (Show)
+instance Read Instruction where 
+  readsPrec _ xs = case take 3 xs of 
+    "nop" -> [(Nop op $ num xs, "")]
+    "acc" -> [(Acc op $ num xs, "")]
+    "jmp" -> [(Jmp op $ num xs, "")]
+    where num = read . dropWhile (not . isDigit)
+          op = (read :: String -> Op) $ 
+            head ( dropWhile (\x -> isLetter x || x == ' ') xs) : ""
+
 data Op = Sub | Add deriving Show
+instance Read Op where
+  readsPrec _ xs = case head xs of 
+    '+' -> [(Add,"")] 
+    '-' -> [(Sub,"")]
 
 calc :: Op -> Int -> Int -> Int 
 calc Add = (+)
 calc Sub = (-)
-
--- shitfest parsing
-parse str = case take 3 str of
-  "nop" -> Nop getOp $ num str
-  "acc" -> Acc getOp $ num str
-  "jmp" -> Jmp getOp $ num str
-  where
-    num = read . dropWhile (not . isDigit)
-    getOp = case dropWhile (\x -> isLetter x || x == ' ') str of 
-      '+':_ -> Add 
-      '-':_ -> Sub
-arrFromList lst = array (0, length lst) $ zip [0..] lst
-main =  brute . arrFromList . zip (repeat False) . map parse . lines =<< readFile "input.txt"
 
 try :: Array Int (Bool, Instruction) -> Int -> Int -> [Int] -> IO (Either Int [Int]) 
 try code global pointer lastInstr
